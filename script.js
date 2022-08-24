@@ -227,12 +227,12 @@ function comparePkmn() {
         format["eggGroups"] = counter > 0 ? "yellow" : "red";
     }
 
-    let html = '<div class="cell pic"><img src=' + currentGuess.pic + '></div>' +
+    let html = '<div class="cell pic ' + currentGuess.types[0] + '"><img src=' + currentGuess.pic + '></div>' +
         '<div class="cell ' + format.id + '">' + currentGuess.id + '</div>' +
         '<div class="cell ' + format.types + '">' + currentGuess.type + '</div>' +
         '<div class="cell ' + format.abilities + '">' + currentGuess.ability + '</div>' +
         '<div class="cell ' + format.eggGroups + '">' + currentGuess.eggGroup + '</div>' +
-        '<div class="cell ' + format.weight + '">' + currentGuess.weight + '</div>' +
+        '<div class="cell ' + format.weight + '">' + parseFloat(currentGuess.weight / 10).toFixed(1) + ' kg</div>' +
         '<div class="cell ' + format.evolves + '">' + currentGuess.evolves + '</div>';
     return html;
 }
@@ -254,8 +254,9 @@ $("document").ready(function () {
             setTimeout(function () {
                 let t = comparePkmn();
                 $("#guess-list").prepend('<li class="grid-container">' + t + "</li>");
-            }, 400);
+            }, 500);
         }
         e.preventDefault();
+        $("#guess")[0].reset();
     })
 })
