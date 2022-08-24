@@ -1,22 +1,30 @@
 let currentGuesses = [];
 var pokedex = [];
 var correctGuess = {};
+var currentGuess = {};
 
-// fill pokedex
+// capitalize first letter for fomatting
+
+function capitalize(word) {
+    //    return word.charAt(0).toUpperCase() + word.slice(1);
+    return word.split('-').map((x) => x.charAt(0).toUpperCase() + x.slice(1)).join(' ');
+}
+
+// fill pokedex with all 905 pokemon
 
 $.ajax({
     "url": "https://pokeapi.co/api/v2/pokemon-species/?limit=905",
     "method": "GET",
     "timeout": 0,
 }).done(function (response) {
-    console.log(response);
+    // console.log(response);
     response.results.forEach(function (a) {
-        pokedex.push(a.name.charAt(0).toUpperCase() + a.name.slice(1));
+        pokedex.push(capitalize(a.name));
     })
 });
 
 
-// autocomplete for guess box
+// autocomplete for guess box, shows the first 5 results
 
 $(function () {
     $("#pokemon").autocomplete({
@@ -26,6 +34,7 @@ $(function () {
         }
     })
 });
+
 
 // evolution format data functions from Oxleberry (https://codepen.io/oxleberry/pen/dyYLyVW)
 // takes multi-level evolution structure from PokeAPI and converts it to a single-level data structure
@@ -86,18 +95,18 @@ function hasNextEvolution(pokemonName, evoChainArr) {
 
             // if next element is a multi-evolution then this pokemon can evolve 
             if (Array.isArray(evoChainArr[i + 1])) {
-                return true;
+                return "Yes";
             } else {
                 // false = single-path evolution
 
                 // checks if pokemon is at end of the evolution chain
                 // if true, pokemon can no longer evolve - return false
-                return (i == evoChainArr.length - 1) ? false : true;
+                return (i == evoChainArr.length - 1) ? "No" : "Yes";
             }
         }
     }
     // if pokemon cannot be found then it is in a nested array and therefore a final evolution that cannot evolve
-    return false;
+    return "Yes";
 }
 
 // Get pokemon info via number
@@ -113,15 +122,16 @@ function getPokemon(num) {
         "method": "GET",
         "timeout": 0,
     }).done(function (pokemon) {
-        console.log(pokemon);
+
+        // console.log(pokemon);
         poke["id"] = pokemon.id;
         poke["name"] = pokemon.species.name;
         poke["pic"] = pokemon.sprites.front_default;
-        poke["types"] = pokemon.types.map((type) => type.type.name);
-        poke["type"] = pokemon.types.map((type) => type.type.name).join(", ");
+        poke["types"] = pokemon.types.map((type) => capitalize(type.type.name));
+        poke["type"] = pokemon.types.map((type) => capitalize(type.type.name)).join(",<br/>");
         // poke["type2"] = pokemon.types.length > 1 ? pokemon.types[1].type.name : "none";
-        poke["abilities"] = pokemon.abilities.map((ability) => ability.ability.name);
-        poke["ability"] = pokemon.abilities.map((ability) => ability.ability.name).join(", ");
+        poke["abilities"] = pokemon.abilities.map((ability) => capitalize(ability.ability.name));
+        poke["ability"] = pokemon.abilities.map((ability) => capitalize(ability.ability.name)).join(",<br/>");
         poke["weight"] = pokemon.weight;
 
         // second API call for more specific info
@@ -131,10 +141,11 @@ function getPokemon(num) {
             "method": "GET",
             "timeout": 0,
         }).done(function (species) {
-            console.log(species);
-            poke["eggGroups"] = species.egg_groups.map((group) => group.name);
-            poke["eggGroup"] = species.egg_groups.map((group) => group.name).join(", ");
-            poke["isLegendary"] = species.is_legendary;
+
+            // console.log(species);
+            poke["eggGroups"] = species.egg_groups.map((group) => capitalize(group.name));
+            poke["eggGroup"] = species.egg_groups.map((group) => capitalize(group.name)).join(",<br/>");
+            // poke["isLegendary"] = species.is_legendary;
 
             // last API call for evolution tree
 
@@ -145,41 +156,106 @@ function getPokemon(num) {
             }).done(function (evolves) {
                 // console.log(evolves);
                 let evoFind = setEvo(evolves);
-                poke["evolves"] = hasNextEvolution(poke["name"], evoFind)
+                poke["evolves"] = hasNextEvolution(poke["name"], evoFind);
             });
         });
     });
     return poke;
 }
 
-function capitalize(word) {
-    return word.charAt(0).toUpperCase() + word.slice(1);
-}
-
 // compare pokemon
 
-function comparePkmn(correctGuess, guess) {
+function comparePkmn() {
     let format = {};
+    // ID, type, ability, eggs, evolves, weight
+    console.log(currentGuess);
+    // console.log(correctGuess);
+
+    // id and weight comparison
+    format["id"] = currentGuess.id === correctGuess.id ? "green none" : "red " + (currentGuess.id < correctGuess.id ? "up" : "down");
+    format["weight"] = currentGuess.weight === correctGuess.weight ? "green none" : "red " + (currentGuess.weight < correctGuess.weight ? "up" : "down");
+
+    format["evolves"] = currentGuess.evolves === correctGuess.evolves ? "green" : "red";
+
+    // type, ability, eggs comparison use the same logic as they are all arrays
+
+    // if same length
+    if (currentGuess.types.length == correctGuess.types.length) {
+        let counter = 0;
+        currentGuess.types.forEach(type => {
+            if (correctGuess.types.includes(type)) ++counter;
+        })
+        format["types"] = counter === correctGuess.types.length ? "green" : counter > 0 ? "yellow" : "red";
+    } else {
+        // different length, only possible yellow/red
+        let counter = 0;
+        currentGuess.types.forEach(type => {
+            if (correctGuess.types.includes(type)) ++counter;
+        })
+        format["types"] = counter > 0 ? "yellow" : "red";
+    }
+
+
+    if (currentGuess.abilities.length == correctGuess.abilities.length) {
+        let counter = 0;
+        currentGuess.abilities.forEach(ability => {
+            if (correctGuess.abilities.includes(ability)) ++counter;
+        })
+        format["abilities"] = counter === correctGuess.abilities.length ? "green" : counter > 0 ? "yellow" : "red";
+    } else {
+        // different length, only possible yellow/red
+        let counter = 0;
+        currentGuess.abilities.forEach(ability => {
+            if (correctGuess.abilities.includes(ability)) ++counter;
+        })
+        format["abilities"] = counter > 0 ? "yellow" : "red";
+    }
+
+
+    if (currentGuess.eggGroups.length == correctGuess.eggGroups.length) {
+        let counter = 0;
+        currentGuess.eggGroups.forEach(eggGroup => {
+            if (correctGuess.eggGroups.includes(eggGroup)) ++counter;
+        })
+        format["eggGroups"] = counter === correctGuess.eggGroups.length ? "green" : counter > 0 ? "yellow" : "red";
+    } else {
+        // different length, only possible yellow/red
+        let counter = 0;
+        currentGuess.eggGroups.forEach(eggGroup => {
+            if (correctGuess.eggGroups.includes(eggGroup)) ++counter;
+        })
+        format["eggGroups"] = counter > 0 ? "yellow" : "red";
+    }
+
+    let html = '<div class="cell pic"><img src=' + currentGuess.pic + '></div>' +
+        '<div class="cell ' + format.id + '">' + currentGuess.id + '</div>' +
+        '<div class="cell ' + format.types + '">' + currentGuess.type + '</div>' +
+        '<div class="cell ' + format.abilities + '">' + currentGuess.ability + '</div>' +
+        '<div class="cell ' + format.eggGroups + '">' + currentGuess.eggGroup + '</div>' +
+        '<div class="cell ' + format.weight + '">' + currentGuess.weight + '</div>' +
+        '<div class="cell ' + format.evolves + '">' + currentGuess.evolves + '</div>';
+    return html;
 }
 
 // user clicks submit
 $("document").ready(function () {
 
-    correctGuess = getPokemon(150);
-    console.log(correctGuess);
-    var currentGuess;
+    let x = 150;
+    correctGuess = getPokemon(x);
 
     $("#guess").submit(function (e) {
-        // const guess = $("input").val().charAt(0).toUpperCase() + $("input").val().slice(1);
-        const guess = capitalize($("input").val());
+        let guess = capitalize($("input").val());
         if (pokedex.indexOf(guess) > -1) {
-            console.log(guess);
+            // console.log(guess);
             currentGuess = getPokemon(pokedex.indexOf(guess) + 1);
-            console.log(currentGuess);
-            // comparePkmn(correctGuess, currentGuess);
-            $("#guess-list").append("<li>a</li>");
+            let y = pokedex.indexOf(guess) + 1;
+            // console.log(x);
+            // console.log(y);
+            setTimeout(function () {
+                let t = comparePkmn();
+                $("#guess-list").prepend('<li class="grid-container">' + t + "</li>");
+            }, 400);
         }
-
         e.preventDefault();
     })
 })
