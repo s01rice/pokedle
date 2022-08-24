@@ -11,3 +11,32 @@ ul {
 .flex-container {
     display: flex;
 }
+
+.grid-container {
+    width: 500px;
+    height: 100px;
+    display: grid;
+    grid-template-columns: repeat(7,  1fr);
+    grid-template-rows: auto;
+    border: 1px solid red;
+    justify-items: center;
+    align-items: center;
+}
+
+.cell {
+    border: 1px solid blue;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.green {
+    background-color: green;
+}
+
+.yellow {
+    background-color: #ffdd00;
+}
+
+.red {
+    background-color: #aa0000;
+}
