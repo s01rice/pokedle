@@ -238,7 +238,7 @@ function comparePkmn() {
         '<div class="cell ' + format.types + '">' + currentGuess.type + '</div>' +
         '<div class="cell ' + format.abilities + '">' + currentGuess.ability + '</div>' +
         '<div class="cell ' + format.eggGroups + '">' + currentGuess.eggGroup + '</div>' +
-        '<div class="cell ' + format.weight + '">' + parseFloat(currentGuess.weight / 10).toFixed(1) + ' kg</div>' +
+        '<div class="cell ' + format.weight + '">' + parseFloat(currentGuess.weight / 10).toFixed(1) + ' kg' + '<div class="arrow">' + (currentGuess.weight < correctGuess.weight ? " &#10514;" : currentGuess.weight > correctGuess.weight ? " &#10515;" : "") + '</div></div>' +
         '<div class="cell ' + format.evolves + '">' + currentGuess.evolves + '</div>';
     return html;
 }
