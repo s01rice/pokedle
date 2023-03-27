@@ -16,14 +16,14 @@
 </head>
 
 <body>
-    <h1> Guess Today's Pokemon! </h1>
 
     <div id="game-board">
+        <h1> Guess Today's Pokemon! </h1>
         <form id="guess" class="flex-container">
             <div class="autocomplete">
                 <input id="pokemon" type="text" name="Pokemon" placeholder="Bulbasaur">
             </div>
-            <input type="submit">
+            <input id="button" type="submit" value="Guess!">
         </form>
         <div class="guesses">
             <ul id="guess-list">
@@ -31,6 +31,7 @@
         </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/seedrandom/2.3.10/seedrandom.min.js"></script>
     <script type="text/javascript" src="script.js"></script>
 </body>
 

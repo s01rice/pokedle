@@ -111,14 +111,17 @@ function hasNextEvolution(pokemonName, evoChainArr) {
 
 // Get pokemon info via number
 
+
 function getPokemon(num) {
 
     let poke = {};
 
-    //initial API call for generic pokemon info
+
+    // initial API call for generic pokemon info
 
     $.ajax({
         "url": "https://pokeapi.co/api/v2/pokemon/" + num + "/",
+        "async": false,
         "method": "GET",
         "timeout": 0,
     }).done(function (pokemon) {
@@ -138,6 +141,7 @@ function getPokemon(num) {
 
         $.ajax({
             "url": pokemon.species.url,
+            "async": false,
             "method": "GET",
             "timeout": 0,
         }).done(function (species) {
@@ -151,6 +155,7 @@ function getPokemon(num) {
 
             $.ajax({
                 "url": species.evolution_chain.url,
+                "async": false,
                 "method": "GET",
                 "timeout": 0,
             }).done(function (evolves) {
@@ -161,6 +166,7 @@ function getPokemon(num) {
         });
     });
     return poke;
+
 }
 
 // compare pokemon
@@ -237,10 +243,19 @@ function comparePkmn() {
     return html;
 }
 
+let head = '<div class="cell title">Pokemon</div>' +
+    '<div class="cell title">Number</div>' +
+    '<div class="cell title">Types</div>' +
+    '<div class="cell title">Abilities</div>' +
+    '<div class="cell title">Egg Group</div>' +
+    '<div class="cell title">Weight</div>' +
+    '<div class="cell title">Evolves?</div>';
+
 // user clicks submit
 $("document").ready(function () {
 
-    let x = 150;
+    console.log(Math.seedrandom(new Date().toJSON().slice(0, 10)));
+    let x = (Math.floor(Math.random() * 905));
     correctGuess = getPokemon(x);
 
     $("#guess").submit(function (e) {
@@ -248,15 +263,21 @@ $("document").ready(function () {
         if (pokedex.indexOf(guess) > -1) {
             // console.log(guess);
             currentGuess = getPokemon(pokedex.indexOf(guess) + 1);
-            let y = pokedex.indexOf(guess) + 1;
-            // console.log(x);
-            // console.log(y);
-            setTimeout(function () {
-                let t = comparePkmn();
-                $("#guess-list").prepend('<li class="grid-container">' + t + "</li>");
-            }, 500);
+            let t = comparePkmn();
+            if (currentGuesses.length == 0) {
+                currentGuesses.push(t);
+                $("#guess-list").append('<li class="grid-container">' + head + "</li>");
+            }
+            $("#guess-list").append('<li class="grid-container">' + t + "</li>");
         }
         e.preventDefault();
         $("#guess")[0].reset();
+
+        if (currentGuess.id == correctGuess.id) {
+            console.log("Success!");
+            $("#pokemon").prop("disabled", true);
+            $("#button").prop("disabled", true);
+            $(".guesses").append('<h1>Success!</h1><h2>Come back again tomorrow!</h2>');
+        }
     })
 })

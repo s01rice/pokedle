@@ -1,14 +1,17 @@
 body {
     font-family: 'League Spartan', sans-serif;
+    background-image: url('background.jpg');
     background-color: #4c4c4c;
 }
 
-h1 {
+h1, h2 {
     text-align: center;
+    color: white;
 }
 
 ul {
     list-style: none;
+    padding-inline-start: 0;
 }
 
 .guesses {
@@ -19,6 +22,30 @@ ul {
 
 .flex-container {
     display: flex;
+    justify-content: center;
+}
+
+#game-board {
+    border: 2px solid black;
+    margin: 80px;
+    border-radius: 10px;
+    background-color:rgba(0,0,0,0.9);
+}
+
+#pokemon {
+    width: 200px;
+    height: 30px;
+}
+
+
+.ui-menu .ui-menu-item{
+    padding: 1px;
+    max-width: 200px;
+    background: white;
+}
+
+.ui-menu .ui-menu-item :hover{
+    background: lightgray;
 }
 
 .grid-container {
@@ -28,9 +55,9 @@ ul {
     grid-template-columns: repeat(7,  110px);
     grid-template-rows: auto;
     grid-gap: 5px;
-    border: 1px solid red;
-    /* justify-items: center;
-    align-items: center; */
+    /* border: 1px solid red; */
+    justify-content: center;
+    /* align-items: center; */
 }
 
 .cell {
@@ -44,6 +71,14 @@ ul {
     text-shadow: 0 0 5px black;
     font-size: 18px;
     padding: 2px;
+}
+
+.title {
+    border: none;
+    box-shadow: none;
+    height: 50px;
+    align-self: end;
+    margin: 2px;
 }
 
 .green {
