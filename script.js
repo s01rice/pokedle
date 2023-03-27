@@ -234,7 +234,7 @@ function comparePkmn() {
     }
 
     let html = '<div class="cell pic ' + currentGuess.types[0] + '"><img src=' + currentGuess.pic + '></div>' +
-        '<div class="cell ' + format.id + '">' + currentGuess.id + '</div>' +
+        '<div class="cell ' + format.id + '">' + currentGuess.id + '<div class="arrow">' + (currentGuess.id < correctGuess.id ? " &#10514;" : currentGuess.id > correctGuess.id ? " &#10515;" : "") + '</div></div>' +
         '<div class="cell ' + format.types + '">' + currentGuess.type + '</div>' +
         '<div class="cell ' + format.abilities + '">' + currentGuess.ability + '</div>' +
         '<div class="cell ' + format.eggGroups + '">' + currentGuess.eggGroup + '</div>' +

@@ -93,6 +93,10 @@ ul {
     background-color: #dd0000;
 }
 
+.arrow {
+    font-size: 24px;
+}
+
 /* color styling by type */
 
 .Normal {background-color: #A8A77A}
